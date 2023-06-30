@@ -7,7 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
 public class Crab extends LinearOpMode {
-
+public double ticksToInches (int ticks){
+    double ticksPerRotation = 537.7;
+    double radius_Inches = 1.89;
+    double num_wheel_rotation = ticks/ticksPerRotation;
+    double distance = num_wheel_rotation * 2 * 3.14 * radius_Inches;
+    return distance;
+}
     @Override
     public void runOpMode() throws InterruptedException {
         // Declare our motors
@@ -17,6 +23,10 @@ public class Crab extends LinearOpMode {
         DcMotor frontRight = hardwareMap.dcMotor.get("frontRight");
         DcMotor backRight = hardwareMap.dcMotor.get("backRight");
 
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // Reverse the right side motors
         // Reverse left motors if you are using NeveRests
         // frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -34,7 +44,7 @@ public class Crab extends LinearOpMode {
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio, but only when
             // at least one is out of the range [-1, 1]
-            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1) * 2;
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1) * 4;
             double frontLeftPower = (y + x + rx) / denominator;
             double backLeftPower = (y - x + rx) / denominator;
             double frontRightPower = (y - x - rx) / denominator;
@@ -44,6 +54,27 @@ public class Crab extends LinearOpMode {
             backLeft.setPower(backLeftPower);
             frontRight.setPower(frontRightPower);
             backRight.setPower(backRightPower);
+
+            frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+            telemetry.addData("frontRight", ticksToInches(frontRight.getCurrentPosition()));
+            telemetry.addData("backRight", -ticksToInches(backRight.getCurrentPosition()));
+            telemetry.addData("frontLeft", -ticksToInches(frontLeft.getCurrentPosition()));
+            telemetry.addData("backLeft", -ticksToInches(backLeft.getCurrentPosition()));
+            telemetry.update();
+            if(gamepad1.a){
+                frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
         }
     }
 }
