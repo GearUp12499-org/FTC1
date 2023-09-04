@@ -58,7 +58,7 @@ public class Crab extends LinearOpMode {
         double sumE = 0;
         // 10 degree error = motor power goes up- by .1 because 10 * 0.01
         double kp = 0.01;
-        double ki = 0.1;
+        double ki = 0.01;
         double kd = 0;
         while (averageDistanceOfMotors() < distToDriveInches && opModeIsActive()) {
             double y = readYaw();
